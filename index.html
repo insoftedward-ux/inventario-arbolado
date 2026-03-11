@@ -1,0 +1,117 @@
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="utf-8">
+
+<link rel="stylesheet"
+href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script src="data.js"></script>
+
+<style>
+
+#map{height:85vh;}
+
+</style>
+
+</head>
+
+<body>
+
+<h2>Inventario de Arbolado</h2>
+
+<input id="buscar" placeholder="Buscar VerticeGPS">
+
+<select id="filtro">
+
+<option value="Todos">Todos</option>
+<option value="Árbol">Árbol</option>
+<option value="Arbusto">Arbusto</option>
+<option value="Cactácea">Cactácea</option>
+
+</select>
+
+<div id="map"></div>
+
+<script>
+
+var map=L.map('map').setView([20.6,-100.4],13)
+
+L.tileLayer(
+'https://tile.openstreetmap.org/{z}/{x}/{y}.png'
+).addTo(map)
+
+var markers=[]
+
+function colorEstado(e){
+
+if(e=="Bueno") return "green"
+if(e=="Regular") return "orange"
+if(e=="Malo") return "red"
+
+}
+
+function crear(tipo){
+
+markers.forEach(m=>map.removeLayer(m))
+markers=[]
+
+trees.forEach(t=>{
+
+if(tipo=="Todos" || t.tipo==tipo){
+
+var m=L.circleMarker(
+[t.lat,t.lon],
+{radius:8,color:colorEstado(t.estado)}
+).addTo(map)
+
+m.bindPopup(
+"<b>"+t.vertice+"</b><br>"+
+t.tipo+"<br>"+
+t.estado+"<br>"+
+"<a href='https://insoftedward-ux.github.io/inventario-arbolado/fichas/"+t.vertice+".html'>Ficha</a>"
+)
+
+markers.push(m)
+
+}
+
+})
+
+}
+
+crear("Todos")
+
+document.getElementById("filtro").onchange=function(){
+
+crear(this.value)
+
+}
+
+document.getElementById("buscar").addEventListener("keyup",function(){
+
+var v=this.value.toLowerCase()
+
+trees.forEach(t=>{
+
+if(t.vertice.toLowerCase()==v){
+
+map.setView([t.lat,t.lon],18)
+
+}
+
+})
+
+})
+
+</script>
+
+</body>
+</html>
+
